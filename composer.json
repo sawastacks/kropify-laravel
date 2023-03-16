@@ -1,0 +1,47 @@
+{
+    "name": "mberecall/kropify-laravel",
+    "description": "A Kropify is a tool that can be integrated into Laravel framework for the purpose of giving users easy way to crop their profile pictures and cover images.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "kropify", 
+        "kropify laravel", 
+        "laravel kropify", 
+        "laravel-kropify",
+        "laravel",
+        "php",
+        "cropper",
+        "crop",
+        "cropping",
+        "mberecall",
+        "irebelibrary"
+    ],
+    "homepage": "https://github.com/mberecall/kropify-laravel/",
+    "authors": [
+        {
+            "name": "MB'DUSENGE Callixte (mberecall)",
+            "email": "info@irebelibrary.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "intervention/image": "^2.7"
+    },
+    "autoload": {
+        "psr-4": {
+           "Mberecall\\Kropify\\": "src"
+         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mberecall\\Kropify\\KropifyServiceProvider"
+            ],
+            "aliases": {
+                "Kropify": "Mberecall\\Kropify\\Facades\\Kropify"
+            }
+                
+        }
+    }
+}

@@ -16,7 +16,7 @@ use Intervention\Image\Facades\Image;
 use Exception;
 
 /**
- * @method static self upload(string $base64Data, string $path, string $filename = null)
+ * @method static self upload(string $file, string $path, string $filename = null)
  * @method static self getName()
  * @method static self getSize()
  * @method static self getWidth()

@@ -74,6 +74,12 @@ After Kropify package updated, you need also to update its assets (css and js fi
  php artisan vendor:publish --tag=kropify-assets --force
 ```
 
+Now finally, for `Kropify` directives, you can run this command to get immediate changes in views.
+
+```bash
+ php artisan view:clear
+```
+
 # Usage
 This package uses css and js files, that is why you first need to include this package assets on your blade file. Place the following directive or helper inside **`<head>`** tag of your blade file for including Kropify css file on page.
 ```html

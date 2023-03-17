@@ -73,6 +73,7 @@ class Kropify
             });
             $result = $image->save($path);
             @list($width, $height, $type, $attr) = getimagesizefromstring(file_get_contents($base64Data));
+            self::$fileSize = (int)(strlen(rtrim($base64Data, '=')) * 3 / 4);
             self::$fileName = $_new_filename;
             self::$fileWidth = $width;
             self::$fileHeight = $height;
@@ -120,7 +121,7 @@ class Kropify
         } else {
             $name = $filename;
         }
-
+        
         $newpath = $path . '/' . $filename;
         $newname = $filename;
         $counter = 1;

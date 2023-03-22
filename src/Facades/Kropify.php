@@ -11,13 +11,11 @@ namespace Mberecall\Kropify\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static self upload(string $file, string $path, string $filename = null)
- * @method static self getSize()
- * @method static self getWidth()
- * @method static self getHeight()
- * @method static self getName()
- * @method static self maxDim(int $value)
+ * @method static self file(string $file, string $filename = null, int $maxDim = null)
+ * @method static self dest(string $path)
+ * @method static self upload()
  */
+ 
 class Kropify extends Facade
 {
     /**

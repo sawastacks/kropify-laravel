@@ -6,8 +6,12 @@
 
 <p align="center">
 
-![GitHub release](https://img.shields.io/github/v/release/mberecall/kropify-laravel) <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel"> [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social">
+[![Latest Version](https://img.shields.io/packagist/v/mberecall/kropify-laravel?label=version)](https://packagist.org/packages/mberecallkropify-laravel/)  <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel"> [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social"> [![GitHub followers](https://img.shields.io/github/followers/mberecall.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/mberecall?tab=followers)
 
+
+
+  
+  
 
 
 </p>
@@ -48,11 +52,7 @@ Just run the following command in your cmd or terminal:
    ```php
      Mberecall\Kropify\KropifyServiceProvider::class,
    ```
-   Inside **`$aliases`** array, add the following package helper.
 
-   ```php
-     'KropifyRender'=> Mberecall\Kropify\Helpers\Helper::class,
-   ```
 
 3. After **Kropify** package installed, you need to publish its css and js files in Laravel public folder by running the following command in terminal:
 
@@ -96,8 +96,8 @@ For **Kropify** Js file, you need to add the following directive or helper insid
 ```html
   ---------
    -----
- <script src="/jquery-3.0.0.min.js"></script>
-     @kropifyScripts
+ <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+  @kropifyScripts
  </body>
 </html>
 ```
@@ -131,8 +131,8 @@ Suppose that you have an input file on your form for user profile picture:
 When you want to initiate **Kropify** on that particular input file, you will use the following scripts.
 ```javascript
   $('#profile-picture').Kropify({
-        viewMode:1,
-        aspectRatio:1,
+        viewType:1,
+        setRatio:1,
         preview:'.profile-picture-box',
         cancelButtonText:'Cancel',
         resetButtonText:'Reset',
@@ -146,8 +146,8 @@ When you want to initiate **Kropify** on that particular input file, you will us
 ### Options
 | Option | Default | Description 
 |-------------  | :-------------: | ---------- |
-| `viewMode` | 1 | You can set this value to (1,2 or 3). But you can not add this option if you are happy with the default value which is 1. |
-| `aspectRatio` | 1 | You can add your custom cropped image ratio. You can use fractional numbers and float numbers. **eg**: `16/4`, `10/32`, `0.25`, `2.25`, etc. |
+| `viewType` | 1 | You can set this value to (1,2 or 3). But you can not add this option if you are happy with the default value which is 1. |
+| `setRatio` | 1 | You can add your custom cropped image ratio. You can use fractional numbers and float numbers. **eg**: `16/4`, `10/32`, `0.25`, `2.25`, etc. |
 |`preview` | **required** | This option is very required, This is where you define the output to preview the cropped image. Here, you must use jquery selector to select **id=""** or **class=""** of the element. We recommended to use `<span>` or `<div>` tags.|
 |`cancelButtonText` | Cancel | You can change this button text with your need and according to your language. |
 | `resetButtonText` | Reset| You can change this button text with your need and according to your language.|
@@ -188,29 +188,40 @@ To upload the cropped image you will use the following lines inside method:
 ```php
 // $path = 'uploads/';
 // $path = storage_path('app/public/uploads/');
- $path = public_path('uploads/');
+ $path = public_path('uploads/');  
 
- $upload = Kropify::upload($request->input('profile-picture'), $path);
+ $upload =  Kropify::file($request->input('profile-picture'), null, null)
+                    ->dest($path)
+                    ->upload();
 
- $upload = Kropify::maxDim(2000)->upload($request->input('profile-picture'), $path);   
+$upload =  Kropify::file($request->input('profile-picture'), 'cover.jpg', 1111)
+                    ->dest($path)
+                    ->upload();
+
 ```
-The above lines will upload the cropped image in the specified path. You can upload this image in Laravel public folder or n Laravel storage folder.
-Very important function is **`maxDim()`**. This function will limit maximum dimensions (Width or Height) in px value of the uploaded image. If you do not need to compress and resize the cropped image, just do not add **``maxDim()``** to the **Kropify** upload function chain.
+The above lines will upload the cropped image in the specified path. You can upload this image in Laravel public folder or in Laravel storage folder.
+Very important function is **`file()`** on the chain. This function has three parameters. First parameter will be the input file data from a form. The second parameter will be the name of the image before uploaded. If you don't need to mention image name, just leave this second parameter to the **null** value. And the third parameter will be the maximum image dimension (width or height) in px. If you do not need to compress and resize the cropped image, just on this third parameter, set this value to **null**.
 
-When image uploaded successfully, you can get the uploaded image name, size, width and Height when you need to store them into database.
-Below are exaamples of getting uploaded info:
+The second function on the chain **`dist()`** is where you can mention the uploaded image destination. This function parameter is a must, you can not leave this empty.
+
+The last function on this chain is **`upload()`**, This function do not have any parameter. This must be added on the last position on the chain.
+
+When image uploaded successfully, you can get the uploaded image name, size, width and Height. You can store these information into database if you want to.
+Below are examples of getting uploaded info:
 
 ```php
 // $path = 'uploads/';
 // $path = storage_path('app/public/uploads/');
  $path = public_path('uploads/');
+ 
+ $upload =  Kropify::file($request->input('profile-picture'), 'cover.jpg', 1111)
+                   ->dest($path)
+                   ->upload();
 
- $upload = Kropify::maxDim(2000)->upload($request->input('profile-picture'), $path); 
-
- $imageName = $upload::getName(); //mypicture.png
- $mageSize = $upload::getSize(); //232342 in bytes
- $imageWidth = $upload::getWidth(); //1204
- $imageHeight = $upload::getHeight(); //400
+ $imageName = $upload['getName']; //mypicture.png
+ $mageSize = $upload['getSize']; //232342 in bytes
+ $imageWidth = $upload['getWidth']; //1111
+ $imageHeight = $upload['getHeight']; //400
 ```
 
 **`NOTICE:`** When you submit a form with ajax, you will need to add below reset function `kropify.reset()`
@@ -229,7 +240,7 @@ success:function(response){
 
 ## Not supported
 Currently, uploading cropped image using Laravel **`Livewire`** is not supported. This package still in development, Once uploading cropped image in Laravel Livewire available, we will notify you.
-You can not also upload image to AWS Amazon `S3`.
+You can not also upload image to **`AWS Amazon S3`**.
 
 <br>
 

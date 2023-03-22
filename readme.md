@@ -6,7 +6,8 @@
 
 <p align="center">
 
-[![Latest Version](https://img.shields.io/packagist/v/mberecall/kropify-laravel?label=version)](https://packagist.org/packages/mberecallkropify-laravel/)  <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel"> [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social"> [![GitHub followers](https://img.shields.io/github/followers/mberecall.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/mberecall?tab=followers)
+[![Latest Version](https://img.shields.io/packagist/v/mberecall/kropify-laravel?label=version)](https://packagist.org/packages/mberecallkropify-laravel/) [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social"> [![GitHub followers](https://img.shields.io/github/followers/mberecall.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/mberecall?tab=followers)
+
 
 
 
@@ -20,11 +21,11 @@
 
 **Irebe Library** brought you easy cropping image tool for user profile picture, cover image, etc... that can be integrated into Laravel project.
 
-> **NOTE:** **`Kropify`** cannot be integrated into Laravel framework only. It has another php version that can be integrated into CodeIgniter and Core PHP projects.  
+> **NOTE:** **`Kropify`** cannot be integrated into Laravel framework only. It has another php package version that can be integrated into CodeIgniter and Core PHP projects.  
 
 ## Background: What is a **Kropify**?
 
-A **Kropify** is a tool that can be integrated into `Laravel framework`, `CodeIgniter framework` and `Core PHP` projects for the purpose of giving users easy way to crop their profile pictures and covers. It uses [JQuery 3.x](https://releases.jquery.com/) library in its functionality. That's why it is important to link JQuery library on current page.
+A **Kropify** is a tool that can be integrated into `Laravel`, `CodeIgniter` and `Core PHP` projects for the purpose of giving users easy way to crop their profile pictures and covers. It uses [JQuery 3.x](https://releases.jquery.com/) library in its functionality. That's why it is important to link JQuery library on current page.
 
 ## Requirements
 
@@ -45,8 +46,8 @@ Just run the following command in your cmd or terminal:
      composer require mberecall/kropify-laravel
     ```
 
-    The package will automatically register its service provider if your Laravel framework is 8.x or above. And also, If Image Intervention package was not installed before, This package will install Image Intervention package to your Laravel project.
-2. Optionally, After you have installed **Kropify**, open your Laravel config    file **`config/app.php`** and add the following lines.
+    The package will automatically register its service provider if your Laravel framework is 8.x or above. And also, If the Image Intervention package was not installed before, This package will install Image Intervention package to your Laravel project.
+2. Optionally, After you have installed **Kropify**, open your Laravel config    file **`config/app.php`** and add the following line.
 
     In the **`$providers`** array, add the service providers for this package.
    ```php
@@ -68,7 +69,7 @@ When new **Kropify** version released and try to update the installed current pa
  composer update mberecall/kropify-laravel
 ```
 
-After Kropify package updated, you need also to update its assets (css and js files) by running the following command in terminal:
+After **`Kropify`** package updated, you need also to update its assets (css and js files) by running the following command in terminal:
 
 ```bash
  php artisan vendor:publish --tag=kropify-assets --force
@@ -81,7 +82,7 @@ Now finally, for `Kropify` directives, you can run this command to get immediate
 ```
 
 # Usage
-This package uses css and js files, that is why you first need to include this package assets on your blade file. Place the following directive or helper inside **`<head>`** tag of your blade file for including Kropify css file on page.
+This package uses css and js files, that is why you first need to include this package assets on your blade file. Place the following directive inside **`<head>`** tag of your blade file for including Kropify css file on page.
 ```html
 <html>
  <head>
@@ -91,7 +92,7 @@ This package uses css and js files, that is why you first need to include this p
  -----
  </head>
 ```
-For **Kropify** Js file, you need to add the following directive or helper inside **`<body>`**  tag but before closing **`</body>`** tag.
+For **Kropify** Js file, you need to add the following directive inside **`<body>`**  tag but before closing **`</body>`** tag.
 
 ```html
   ---------
@@ -191,12 +192,12 @@ To upload the cropped image you will use the following lines inside method:
  $path = public_path('uploads/');  
 
  $upload =  Kropify::file($request->input('profile-picture'), null, null)
-                    ->dest($path)
-                    ->upload();
+                   ->dest($path)
+                   ->upload();
 
-$upload =  Kropify::file($request->input('profile-picture'), 'cover.jpg', 1111)
-                    ->dest($path)
-                    ->upload();
+ $upload =  Kropify::file($request->input('profile-picture'), 'cover.jpg', 1920)
+                   ->dest($path)
+                   ->upload();
 
 ```
 The above lines will upload the cropped image in the specified path. You can upload this image in Laravel public folder or in Laravel storage folder.
@@ -214,13 +215,13 @@ Below are examples of getting uploaded info:
 // $path = storage_path('app/public/uploads/');
  $path = public_path('uploads/');
  
- $upload =  Kropify::file($request->input('profile-picture'), 'cover.jpg', 1111)
+ $upload =  Kropify::file($request->input('profile-picture'), 'cover.jpg', 1920)
                    ->dest($path)
                    ->upload();
 
  $imageName = $upload['getName']; //mypicture.png
  $mageSize = $upload['getSize']; //232342 in bytes
- $imageWidth = $upload['getWidth']; //1111
+ $imageWidth = $upload['getWidth']; //1920
  $imageHeight = $upload['getHeight']; //400
 ```
 

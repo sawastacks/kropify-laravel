@@ -6,7 +6,7 @@
 
 <p align="center">
 
-[![Latest Version](https://img.shields.io/packagist/v/mberecall/kropify-laravel?label=version)](https://packagist.org/packages/mberecallkropify-laravel/) [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social"> [![GitHub followers](https://img.shields.io/github/followers/mberecall.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/mberecall?tab=followers)
+[![Latest Version](https://img.shields.io/packagist/v/mberecall/kropify-laravel?label=version)](https://packagist.org/packages/mberecall/kropify-laravel/) [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social"> [![GitHub followers](https://img.shields.io/github/followers/mberecall.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/mberecall?tab=followers)
 
 
 

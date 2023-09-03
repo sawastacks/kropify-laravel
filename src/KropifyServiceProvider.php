@@ -23,8 +23,8 @@ class KropifyServiceProvider extends ServiceProvider
     /**
      * @var string
      */
-    // const PACKAGE_PUBLIC_ASSETS_PATH = 'vendors/mberecall/kropify';
-    const PACKAGE_PUBLIC_ASSETS_PATH = 'packages/mberecall/kropify';
+    const PACKAGE_PUBLIC_ASSETS_PATH = 'vendors/mberecall/kropify';
+    // const PACKAGE_PUBLIC_ASSETS_PATH = 'packages/mberecall/kropify';
     /**
      * Register services.
      * @return void
@@ -49,7 +49,8 @@ class KropifyServiceProvider extends ServiceProvider
 
         if ( $this->app->runningInConsole() ) {
             // $viewPath = __DIR__ . './resources/assets';
-            $viewPath = __DIR__ . '/../resources/assets';
+            // $viewPath = __DIR__ . '/../resources/assets';
+            $viewPath = __DIR__ . '/'.'resources/assets';
             $this->publishes([
                 $viewPath => public_path($package_public_assets_path),
             ], 'kropify-assets');

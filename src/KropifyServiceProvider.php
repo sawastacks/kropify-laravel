@@ -47,7 +47,7 @@ class KropifyServiceProvider extends ServiceProvider
         $package_public_assets_path = self::PACKAGE_PUBLIC_ASSETS_PATH;
 
         if ( $this->app->runningInConsole() ) {
-            $viewPath = __DIR__ . '/resources/assets';
+            $viewPath = __DIR__ . './resources/assets';
             $this->publishes([
                 $viewPath => public_path($package_public_assets_path),
             ], 'kropify-assets');

@@ -1,21 +1,23 @@
 <?php
+
 /**
  * Copyright (c) 2023 - present
- * Kropify - Kropify.php
- * author: MB'DUSENGE Callixte - info@irebelibrary.com
- * web : github.com/mberecall
+ * Kropify - Kropify.php facade
+ * Author: MB'DUSENGE Callixte - mberecall@gmail.com
+ * GitHub : github.com/mberecall
  * Initial version created on: 10/03/2023
  * MIT license: https://github.com/mberecall/kropify-laravel/blob/master/LICENSE
  */
+
 namespace Mberecall\Kropify\Facades;
+
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static self file(string $file, string $filename = null, int $maxDim = null)
- * @method static self dest(string $path)
- * @method static self upload()
+ * @method static self getFile(string $file, string $filename = null)
+ * @method static self maxWoH(int $max)
+ * @method static self save(string $path)
  */
- 
 class Kropify extends Facade
 {
     /**
@@ -23,7 +25,8 @@ class Kropify extends Facade
      * @return string
      * @see Kropify
      */
-     protected static function getFacadeAccessor(){
-           return 'kropify';
-      }
+    protected static function getFacadeAccessor()
+    {
+        return 'kropify';
+    }
 }

@@ -3,8 +3,8 @@
 /**
  * Copyright (c) 2023 - present
  * Kropify - Kropify.php
- * author: MB'DUSENGE Callixte - info@irebelibrary.com
- * web : github.com/mberecall
+ * Author: MB'DUSENGE Callixte - mberecall@gmail.com
+ * GitHub : github.com/mberecall
  * Initial version created on: 10/03/2023
  * MIT license: https://github.com/mberecall/kropify-laravel/blob/master/LICENSE
  */
@@ -14,21 +14,48 @@ namespace Mberecall\Kropify;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Request;
 use Intervention\Image\Facades\Image;
 use Exception;
 
 /**
- * @method static self file(string $file, string $filename = null, int $maxDim = null)
- * @method static self dest(string $path)
- * @method static self upload()
+ * @method static self getFile(string $file, string $filename = null)
+ * @method static self maxWoH(int $max)
+ * @method static self save(string $path)
  */
 
 class Kropify
 {
-    private static $_file;
-    private static $_filename;
-    private static $_maxDim;
-    private static $uploadTo;
+    /**
+     * The requested file.
+     *
+     * @var string
+     */
+    private static $_getFile;
+    /**
+     * Set new file name
+     *
+     * @var string
+     */
+    private static $_setFileName;
+    /**
+     * Set path
+     *
+     * @var string
+     */
+    private static $_setPath;
+
+    /**
+     * Set maximum width or height
+     *
+     * @var int
+     */
+    private static $_maxWoH;
+
+    /**
+     * Get file info
+     */
+    private static $_fileInfo = null;
 
     public function __call($name, $arguments)
     {
@@ -36,48 +63,50 @@ class Kropify
     }
 
     /**
-     * @method static string file(string $file, string $filename, int $maxDim)
+     * Get requested image file
+     * 
+     * @param string $file
+     * @param string $filename
+     * @return \Mberecall\Kropify\Kropify
      */
-    public static function file($file, $filename = null, $maxDim = null)
+    public static function getFile($file, $filename = null)
     {
-        self::$_file = $file;
-        self::$_filename = $filename;
-        self::$_maxDim = $maxDim;
+        self::$_getFile = $file;
+        self::$_setFileName = $filename;
         return new static;
     }
 
     /**
-     *  @method static string is_base64(string $value)
+     * @param int $max
+     * @return \Mberecall\Kropify\Kropify
      */
-    public static function is_base64($value)
+    public static function maxWoH($max = 500)
     {
-        // Check if there are valid base64 characters
-        if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value)) return false;
-
-        // Decode the string in strict mode and check the results
-        $decoded = base64_decode($value, true);
-        if (false === $decoded) return false;
-
-        // Encode the string again
-        if (base64_encode($decoded) != $value) return false;
-
-        return true;
-    }
-
-    /**
-     *  @method static string dest(string $path)
-     */
-    public static function dest($path)
-    {
-        self::$uploadTo = $path;
+        self::$_maxWoH = $max;
         return new static;
     }
 
     /**
+     * @method static string addEndingSlash(string $path)
+     */
+    public static function addEndingSlash($path)
+    {
+        $slashType = (strpos($path, '\\') === 0) ? 'win' : 'unix';
+        $lastChar = substr($path, strlen($path) - 1, 1);
+        if ($lastChar != '/' && $lastChar != '\\') {
+            $path .= ($lastChar == 'win' ? '\\' : '/');
+        }
+        return $path;
+    }
+
+    /**
+     * Generate and return unique image filename
+     * 
      * @method static string setFileName(string $path, string $filename)
      */
     public static function setFileName($path, $filename)
     {
+        $filename = self::decideFileExtension($filename);
         if ($pos = strrpos($filename, '.')) {
             $name = substr($filename, 0, $pos);
             $ext = substr($filename, $pos);
@@ -96,17 +125,158 @@ class Kropify
         return $newname;
     }
 
-    /**
-     *  @method static string addEndingSlash(string $path)
+     /**
+     * Return real file extension
+     * 
+     * @method static string decideFileExtension(string $filename)
      */
-    public static function addEndingSlash($path)
+    public static function decideFileExtension($filename)
     {
-        $slashType = (strpos($path, '\\') === 0) ? 'win' : 'unix';
-        $lastChar = substr($path, strlen($path) - 1, 1);
-        if ($lastChar != '/' && $lastChar != '\\') {
-            $path .= ($lastChar == 'win' ? '\\' : '/');
+        $fn = null;
+        if (preg_match('/(\.jpg|\.png|\.bmp|\.jpg)$/i', $filename)) {
+            $fn = $filename;
+        } else {
+            $fn = $filename .= ".png";
         }
-        return $path;
+        return $fn;
+    }
+
+    /**
+     * Upload cropped image without maximum width or height option
+     * 
+     * @method static string uploadWithoutMaxWoH(string $file, string $path, string $filename)
+     */
+    public static function uploadWithoutMaxWoH($file, $path, $filename)
+    {
+        try {
+            $upload = $file->move($path, $filename);
+            if ($upload) {
+                $arr = [
+                    'getName' => $filename,
+                    'getSize' => self::getUploadeImageSize($path, $filename),
+                    'getWidth' => self::getUploadeImageDimension($path, $filename)[0],
+                    'getHeight' => self::getUploadeImageDimension($path, $filename)[1],
+                ];
+                self::$_fileInfo = (object)$arr;
+            } else {
+                return [];
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     * Upload cropped image with maximum width or height option
+     * 
+     * @method static string uploadWithMaxWoH(string $file, string $path, string $filename, int $maxWoH)
+     */
+    public static function uploadWithMaxWoH($file, $path, $filename, $maxWoH)
+    {
+        try {
+
+            if ($maxWoH && $maxWoH != null) {
+                $s_width = $maxWoH;
+                $s_height = $maxWoH;
+                $actual_path = $path;
+                $path = $path . $filename;
+                $image = Image::make($file->path());
+                $image->height() > $image->width() ? $s_width = null : $s_height = null;
+                $image->resize($s_width, $s_height, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
+                $image->save($path);
+
+                $arr = [
+                    'getName' => $filename,
+                    'getSize' => self::getUploadeImageSize($actual_path, $filename),
+                    'getWidth' => self::getUploadeImageDimension($actual_path, $filename)[0],
+                    'getHeight' => self::getUploadeImageDimension($actual_path, $filename)[1],
+                ];
+                self::$_fileInfo = (object)$arr;
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     * Return all Image Details
+     * 
+     * @return self
+     */
+    public static function getInfo()
+    {
+        return self::$_fileInfo;
+    }
+
+    /**
+     * Return Image Name
+     * 
+     * @return self
+     */
+    public static function getName()
+    {
+        return self::$_fileInfo->getName;
+    }
+
+    /**
+     * Return Image Size
+     * 
+     * @return self
+     */
+    public static function getSize()
+    {
+        return self::$_fileInfo->getSize;
+    }
+
+    /**
+     * Return Image Wight
+     * 
+     * @return self
+     */
+    public static function getWidth()
+    {
+        return self::$_fileInfo->getWidth;
+    }
+
+    /**
+     * Return Image Height
+     * 
+     * @return self
+     */
+    public static function getHeight()
+    {
+        return self::$_fileInfo->getHeight;
+    }
+
+    /**
+     * Save cropped image to the specified path
+     * 
+     * @param  string $path
+     * @return self
+     */
+    public static function save($path)
+    {
+        if (!self::$_getFile) {
+            throw new Exception('Define "getFile()" function with value');
+        }
+
+        if ($path == null || empty($path)) {
+            throw new Exception('Define "save($path)" by adding real path argument');
+        }
+        self::$_setPath = $path;
+        $getpath = self::$_setPath;
+        $path = self::addEndingSlash($getpath);
+        File::ensureDirectoryExists($path);
+        $toPath = $path;
+        $filename = (self::$_setFileName) ? self::$_setFileName :  md5(rand(1, 10)) . time() . bin2hex(random_bytes(10)) . '.png';
+        $new_filename = self::setFileName($path, $filename);
+        $file = self::$_getFile;
+        self::$_maxWoH ? self::uploadWithMaxWoH($file, $toPath, $new_filename, self::$_maxWoH) : self::uploadWithoutMaxWoH($file, $toPath, $new_filename);
+
+        return new static;
     }
 
     /**
@@ -114,7 +284,7 @@ class Kropify
      */
     public static function getUploadeImageSize($path, $filename)
     {
-        return File::size(public_path($path . $filename));
+        return File::size($path . $filename);
     }
 
     /**
@@ -123,77 +293,5 @@ class Kropify
     public static function getUploadeImageDimension($path, $filename)
     {
         return getimagesize($path . $filename);
-    }
-
-    /**
-     *  @method static string upload()
-     */
-    public static function upload()
-    {
-        if (!self::$_file) {
-            throw new Exception('Define "file()" function with value');
-        }
-
-        if (!self::$uploadTo) {
-            throw new Exception('Define "dest()" function with file path. This function must have an argument.');
-        }
-
-        $getpath = self::$uploadTo;
-        $path = self::addEndingSlash($getpath);
-        File::ensureDirectoryExists($path);
-        $sPath = $path;
-        $extensions = ['png', 'jpeg', 'jpg'];
-        $base64Data = self::$_file;
-        $_filename = (self::$_filename) ? self::$_filename :  md5(rand(1111, 99999)) . time() . uniqid() . '.png';
-        $_new_filename = self::setFileName($path, $_filename);
-
-        if ( self::$_maxDim && self::$_maxDim != null ) {
-            $s_width = self::$_maxDim;
-            $s_height = self::$_maxDim;
-            $image = str_replace('data:image/png;base64,', '', $base64Data);
-            $image = str_replace(' ', '+', $image);
-            $imageName = $_new_filename;
-            $path = $path . $imageName;
-            $input = File::put($path, base64_decode($image));
-            $image = Image::make($path);
-            $image->height() > $image->width() ? $s_width = null : $s_height = null;
-            $image->resize($s_width, $s_height, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-            $_fWidth = $image->width();
-            $_fHeight = $image->height();
-
-            if ($result = $image->save($path)) {
-                @list($width, $height, $type, $attr) = getimagesizefromstring(file_get_contents($base64Data));
-
-                return [
-                    'getName' => $_new_filename,
-                    'getSize' => self::getUploadeImageSize($sPath, $_new_filename),
-                    'getWidth' => self::getUploadeImageDimension($sPath, $_new_filename)[0],
-                    'getHeight' => self::getUploadeImageDimension($sPath, $_new_filename)[1],
-                ];
-            } else {
-                throw new Exception('Something went wrong for uploading image.');
-            }
-        } else {
-            $file_data = $base64Data;
-            @list($type, $file_data) = explode(';', $file_data);
-            @list(, $file_data) = explode(',', $file_data);
-            if (file_put_contents($path . $_new_filename, base64_decode($file_data))) {
-                @list($width, $height, $type, $attr) = getimagesizefromstring(file_get_contents($base64Data));
-
-                return [
-                    'getName' => $_new_filename,
-                    'getSize' => (int)(strlen(rtrim($base64Data, '=')) * 3 / 4),
-                    'getWidth' => $width,
-                    'getHeight' => $height
-                ];
-            } else {
-                throw new Exception('Something went wrong for uploading image.');
-            }
-        }
-
-        return new static;
     }
 }

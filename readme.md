@@ -6,7 +6,7 @@
 
 <p align="center">
 
-![GitHub release](https://img.shields.io/github/v/release/mberecall/kropify-laravel) <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel">[![Total Downloads](https://poser.pugx.org/mberecall/kropify-laravel/downloads)](https://packagist.org/packages/mberecall/kropify-laravel) [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social">
+![GitHub release](https://img.shields.io/github/v/release/mberecall/kropify-laravel) <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel"> [![Total Downloads](https://poser.pugx.org/mberecall/kropify-laravel/downloads)](https://packagist.org/packages/mberecall/kropify-laravel) [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social">
 
 
 

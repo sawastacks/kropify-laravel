@@ -6,7 +6,7 @@
 
 <p align="center">
 
-![GitHub release](https://img.shields.io/github/v/release/mberecall/kropify-laravel) <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel"> [![Total Downloads](https://img.shields.io/packagist/dt/mberecall/kropify-laravel.svg)](https://packagist.org/packages/mberecall/kropify-laravel)  [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social">
+![GitHub release](https://img.shields.io/github/v/release/mberecall/kropify-laravel) <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/mberecall/kropify-laravel">[![Total Downloads](https://poser.pugx.org/mberecall/kropify-laravel/downloads)](https://packagist.org/packages/mberecall/kropify-laravel) [![Package License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE) <img alt="GitHub Org's stars" src="https://img.shields.io/github/stars/mberecall/kropify-laravel?style=social">
 
 
 
@@ -18,9 +18,15 @@
 
 > **NOTE:** **`Kropify`** cannot be integrated into Laravel framework only. It has another php version that can be integrated into CodeIgniter and Core PHP projects.  
 
+ <p align="center">  
+
+ [![Hello World](img/ko-fi.png)](https://ko-fi.com)
+
+ </p>
+
 ## What is a **Kropify**?
 
-A **Kropify** is a tool that can be integrated into `Laravel framework`, `CodeIgniter framework` and `Core PHP` projects for the purpose of giving users easy way to crop their profile pictures and covers. It uses [JQuery 3.x](https://releases.jquery.com/) library in it's functionality as dependency. That's why it is important to include JQuery library on current blade file.
+A **Kropify** is a tool that can be integrated into `Laravel framework`, `CodeIgniter framework` and `Core PHP` projects for the purpose of giving users easy way to crop their profile pictures and covers. It uses [JQuery 3.x](https://releases.jquery.com/) library in it's functionality as dependency. That's why it is important to include JQuery library on current blade file. 
 
 ## Requirements
 
@@ -84,10 +90,9 @@ This package uses **css** and **js** minified files, that is why you first need 
  <head>
  <title>Page title</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
-   
-   ----
-     @kropifyStyles 
-   -----
+    @kropifyStyles 
+   ......
+   ...
  </head>
 ```
 `NOTICE:` Don't forgot to add `CSRF` meta tags to every blade file included **Kropify** assets as shown in above example.
@@ -95,9 +100,8 @@ This package uses **css** and **js** minified files, that is why you first need 
 For **Kropify** Js file, you need to add the following directive or helper inside **`<body>`**  tag but before closing **`</body>`** tag after including JQuery as shown in below example.
 
 ```html
-  ---------
-   -----
-
+  ..........
+   .....
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
    @kropifyScripts
  </body>
@@ -121,35 +125,23 @@ Suppose that you have an input file on your form for user profile picture:
     <style>
       *{ box-sizing: border-box; padding: 0; margin: 0;}
        body{ font-family: serif;  width: 100%; height: 100%; }
-       .box{
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          margin-top: 20px;
-        }
-        .previewElement{
-          display: block;
-          width: 120px;
-          height: 120px;
-          background: #ddd;
-        }
+       .box{ display: flex;justify-content: center;align-items: center;flex-direction: column; margin-top: 20px; }
+        .previewElement{ display: block;width: 120px;height: 120px;background: #ddd; }
     </style>
 </head>
 <body>
-
   <div class="box">
     <h4>Kropify for Laravel</h4>
     <div class="previewElement"></div>
       <div class="file-box">
-        <label for="">Image file</label>
+        <label>User profile</label>
         <input type="file" name="user_avatar">
       </div>
   </div>
       
-  ---------
-  ----------
-  -----------  
+  ........
+  ..........
+  ...........
    <script src="/jquery-3.0.0.min.js"></script>
    @kropifyScripts
  
@@ -158,14 +150,16 @@ Suppose that you have an input file on your form for user profile picture:
 ```
 When you want to initiate **Kropify** on that particular input file, you will use the following scripts.
 ```javascript
+.......
+......
   <script>
     $('input[name="user_avatar"]').Kropify({
         preview:'.previewElement',
         viewMode:1,
         aspectRatio:1,
         cancelButtonText:'Cancel',
-        resetButtonText:'Reset Now',
-        cropButtonText:'Crop Now',
+        resetButtonText:'Reset',
+        cropButtonText:'Crop & update',
         processURL:'{{ route("crop-handler") }}',
         maxSize:2097152,
         showLoader:true,
@@ -183,6 +177,8 @@ When you want to initiate **Kropify** on that particular input file, you will us
           },
         });
     </script>
+    .......
+    ....
 ```
 ### Options
 | Option | Default | Description 
@@ -198,18 +194,18 @@ When you want to initiate **Kropify** on that particular input file, you will us
 |`showLoader`|true|If you want to display loading element when user croping the selected image, you can set this option to _**true**_. But if you do not want that loading element appears on page, set this option to _**false**_.|
 
 ### Errors callback
-This callback has two parameters, `type` and `message`
+This callback has two parameters, `error` and `text`
 
 ```javascript
- errors:function(type, message){
-            alert(message);
+ errors:function(error, text){
+            console.log(text);
         }
 ```
 
 | Parameter | Description 
 |------------- | ---------- |
-| `type` | This prameter will return two types of errors **invalidFileType** and  **bigFileSize**. You can make a `if` condition according to the returned error type. | 
-| `message` | You can alert this value `eg`: alert(message);. If you are using Toastr.js plugin, You may use `toastr.error(message)'` function to display error alert.|
+| `error` | This prameter will return two types of errors **invalidFileType** and  **bigFileSize**. You can make a `if` condition according to the returned error type. | 
+| `text` | You can alert this value `eg`: alert(message);. If you are using Toastr.js plugin, You may use `toastr.error(text)'` function to display error alert.|
 
 ## In controller
 To include **Kropify** class in controller is very simple. Just import the following lines on your controller.
@@ -218,10 +214,6 @@ To include **Kropify** class in controller is very simple. Just import the follo
  use Mberecall\Kropify\Kropify;
 ```
 
-You can use package facade
-```php
- use Mberecall\Kropify\Facades\Kropify;
-```
 
 To upload the cropped image you will use the following lines inside method:
 

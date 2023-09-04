@@ -20,7 +20,7 @@
 
  <p align="center">  
 
- [![Hello World](img/ko-fi.png)](https://ko-fi.com)
+ [![Hello World](img/ko-fi.png)](https://ko-fi.com/mberecall)
 
  </p>
 

@@ -1,4 +1,4 @@
- <p align="center">  
+<p align="center">  
  
  !['Kropify'](img/kropify.png)
 
@@ -136,7 +136,7 @@ Suppose that you have an input file on your form for user profile picture:
     <div class="previewElement"></div>
       <div class="file-box">
         <label>User profile</label>
-        <input type="file" name="user_avatar">
+        <input type="file" id="avatar" name="avatar">
       </div>
   </div>
       
@@ -149,12 +149,14 @@ Suppose that you have an input file on your form for user profile picture:
 </body>
 </html>
 ```
+## Routes
+```php
+Route::post('/crop',[TestController::class,'cropHandler'])->name('crop-handler');
+```
 When you want to initiate **Kropify** on that particular input file, you will use the following scripts.
 ```javascript
-.......
-......
   <script>
-    $('input[name="user_avatar"]').Kropify({
+    $('input#avatar').Kropify({
         preview:'.previewElement',
         viewMode:1,
         aspectRatio:1,
@@ -166,8 +168,8 @@ When you want to initiate **Kropify** on that particular input file, you will us
         showLoader:true,
         success:function(data){
          // console.log(data);
-         // alert(data.kropifyStatus); //Kropify status
-         // alert(data.kropifyMessage); //Kropify message
+         // console.log(data.kropifyStatus); //Kropify status
+         // console.log(data.kropifyMessage); //Kropify message
          // console.log(data.image.getName); //Get cropped image name
          // console.log(data.image.getSize); //Get cropped image size
          // console.log(data.image.getWidth); //Get cropped image width
@@ -178,8 +180,6 @@ When you want to initiate **Kropify** on that particular input file, you will us
           },
         });
     </script>
-    .......
-    ....
 ```
 ### Options
 | Option | Default | Description 
@@ -191,16 +191,16 @@ When you want to initiate **Kropify** on that particular input file, you will us
 | `resetButtonText` | Reset| You can change this button text with your need and according to your language.|
 |`cropButtonText`| Crop | You can change this button text with your need and according to your language. |
 |`maxSize`| 2097152 | By default, this value set to the maximum size of **2MB** .But, you can set your own maximum size of selected  image. |
-|`processURL`|-|This option is very required. You must define your url of croping selected image.|
+|`processURL`|-|This option is very required. You must define your url of croping selected image. eg: **_processURL : "{{ route('crop') }}"_** or **_processURL : "{{ url('crop') }}"_**|
 |`showLoader`|true|If you want to display loading element when user croping the selected image, you can set this option to _**true**_. But if you do not want that loading element appears on page, set this option to _**false**_.|
 
 ### Errors callback
-This callback has two parameters, `error` and `text`
+This callback has two arguments, `error` and `text`
 
 ```javascript
  errors:function(error, text){
-            console.log(text);
-        }
+    console.log(text);
+ }
 ```
 
 | Parameter | Description 
@@ -224,36 +224,39 @@ To upload the cropped image you will use the following lines inside method:
  $path = storage_path('app/public/uploads/'); //option 2
  $path = public_path('uploads/'); //option 3
 
- $file = $request->file('image');
+//if you did not define name attribute on input file tag, the default name attribute value is "image". eg: $file = $request->file('image');
+ $file = $request->file('avatar'); 
 
 //Upload cropped image options
- $upload = Kropify::getFile($file)->save($path); //This will give us random image name "hsdu538vhsk83.png"
+ $upload = Kropify::getFile($file)->save($path); //This will give us random image name "5678cKs374hxdu5438vhsk83.png"
  $upload = Kropify::getFile($file,'avatar')->save($path); //This will geive us image name "avatar.png"
  $upload = Kropify::getFile($file,'avatar.jpg')->save($path); //This will geive us image name "avatar.jpg"
+ $upload = Kropify::getFile($file,'avatar.dng')->save($path); //When you make a mistake on extension. This will give us image name "avatar.dng.png"
  $upload = Kropify::getFile($file,'avatar.png')->maxWoH(712)->save($path); //This will resize cropped image width or height to `712`
 
  //Return json
  return response()->json(['kropifyStatus'=>"OK",'kropifyMessage'=>'Your profile picture has been.'], 201);
-  
 ```
 The above lines will upload the cropped image in the specified path. The cropped image can be uploaded in Laravel **public** folder or in Laravel **storage** folder.
 Very important function on the chain is **`maxWoH()`**. This function will limit maximum dimensions (Width or Height) in px value of the uploaded image. If you do not need to compress and resize the cropped image, just do not add **``maxWoH()``** to the **Kropify** upload function chain. Make sure that `extension=gd` extension is enable in your server.
 
 When image uploaded successfully, you can get the uploaded image details like name, size, width and Height. You can use these details when you need to store them into database.
-Below are examples of getting uploaded image detalis:
+Below are examples of getting uploaded image details:
 
 ```php
  // Image can be uploaded to public or storage path
- $path = 'uploads/';
- $path = storage_path('app/public/uploads/');
- $path = public_path('uploads/');
+ $path = 'uploads/'; //option 1
+ $path = storage_path('app/public/uploads/'); //option 2
+ $path = public_path('uploads/'); //option 3
 
+//if you did not define name attribute on input file tag, the default name attribute value is "image". $file = $request->file('image');
  $file = $request->file('user_avatar');
 
 //Upload cropped image options
  $upload = Kropify::getFile($file)->save($path); //This will give us random image name "hsdu538vhsk83.png"
  $upload = Kropify::getFile($file,'avatar')->save($path); //This will geive us image name "avatar.png"
- $upload = Kropify::getFile($file,'avatar.jpg')->save($path); //This will geive us image name "avatar.jpg"
+ $upload = Kropify::getFile($file,'avatar.jpg')->save($path); //This will give us image name "avatar.jpg"
+ $upload = Kropify::getFile($file,'avatar.dng')->save($path); //When you make a mistake on extension. This will give us image name "avatar.dng.png"
  $upload = Kropify::getFile($file,'avatar.png')->maxWoH(712)->save($path); //This will mantain maximum width or height of the cropped image to `712`
 
 //Two options to get uploaded image details
@@ -282,4 +285,4 @@ You can not also upload image to AWS Amazon `S3`.
 was written by [MB'DUSENGE Callixte (mberecall)](https://github.com/mberecall) and is released under the 
 [MIT License](https://github.com/mberecall/kropify-laravel/blob/master/LICENSE).
 
-Copyright (c) 2023 - Irebe Libary
+Copyright (c) 2023 - Irebe Library

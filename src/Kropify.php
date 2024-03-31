@@ -57,6 +57,11 @@ class Kropify
      */
     private static $_fileInfo = null;
 
+    public $getName = null;
+    public $getSize = null;
+    public $getWidth = null;
+    public $getHeight = null;
+
     public function __call($name, $arguments)
     {
         return $this;
@@ -218,7 +223,7 @@ class Kropify
      */
     public static function getName()
     {
-        return self::$_fileInfo->getName;
+        return self::getInfo()->getName;
     }
 
     /**
@@ -228,7 +233,7 @@ class Kropify
      */
     public static function getSize()
     {
-        return self::$_fileInfo->getSize;
+        return self::getInfo()->getSize;
     }
 
     /**
@@ -238,7 +243,7 @@ class Kropify
      */
     public static function getWidth()
     {
-        return self::$_fileInfo->getWidth;
+        return self::getInfo()->getWidth;
     }
 
     /**
@@ -248,7 +253,7 @@ class Kropify
      */
     public static function getHeight()
     {
-        return self::$_fileInfo->getHeight;
+        return self::getInfo()->getHeight;
     }
 
     /**

@@ -21,7 +21,7 @@
 
  <p align="center">  
 
- [![Hello World](img/ko-fi.png)](https://ko-fi.com/mberecall)
+ [![Hello World](img/ko-fi.png)](https://buymeacoffee.com/mberecall)
 
  </p>
 
@@ -33,7 +33,7 @@ A **Kropify** is a tool that can be integrated into `Laravel framework`, `CodeIg
 
 - PHP >= 7.2
 - [Composer](https://getcomposer.org/) is required
-- Laravel 8.x, 9.x and 10.x
+- Laravel 8.x, 9.x , 10.x and 11.x
 - [Image Intervention](https://image.intervention.io/v2) package
 - [JQuery 3.x](https://releases.jquery.com/)
 
@@ -49,7 +49,7 @@ Just run the following command in your cmd or terminal:
     ```
 
     The package will automatically register its service provider if your Laravel framework is 8.x or above. And also, If Image Intervention package was not installed before, This package will install Image Intervention package to your Laravel project.
-2. Optionally, After you have installed **Kropify**, open your Laravel config    file **`config/app.php`** and add the following lines.
+2. Optionally, After you have installed **Kropify**, open your Laravel config file **`config/app.php`** and add the following lines.
 
     In the **`$providers`** array, add the service providers for this package.
    ```php
@@ -240,9 +240,6 @@ To upload the cropped image you will use the following lines inside method:
 The above lines will upload the cropped image in the specified path. The cropped image can be uploaded in Laravel **public** folder or in Laravel **storage** folder.
 Very important function on the chain is **`maxWoH()`**. This function will limit maximum dimensions (Width or Height) in px value of the uploaded image. If you do not need to compress and resize the cropped image, just do not add **``maxWoH()``** to the **Kropify** upload function chain. Make sure that `extension=gd` extension is enable in your server.
 
-When image uploaded successfully, you can get the uploaded image details like name, size, width and Height. You can use these details when you need to store them into database.
-Below are examples of getting uploaded image details:
-
 ```php
  // Image can be uploaded to public or storage path
  $path = 'uploads/'; //option 1
@@ -259,19 +256,58 @@ Below are examples of getting uploaded image details:
  $upload = Kropify::getFile($file,'avatar.dng')->save($path); //When you make a mistake on extension. This will give us image name "avatar.dng.png"
  $upload = Kropify::getFile($file,'avatar.png')->maxWoH(712)->save($path); //This will mantain maximum width or height of the cropped image to `712`
 
-//Two options to get uploaded image details
- $infos = Kropify::getInfo(); //option 1
- $infos = $upload->getInfo(); //option 2
+```
 
- //Save image name to database
+### Get Cropped/Uploaded image details
+When cropped image uploaded successfully, you can get the uploaded image information like name, size, width and Height. You can use these details when you need to store them into database.
+Below are examples of getting uploaded image details:
+
+```php
+$path = 'uploads/';
+$file = $request->file('user_avatar');
+$upload = Kropify::getFile($file,'avatar.png')->maxWoH(325)->save($path);
+
+//Get All details
+$infos = Kropify::getInfo(); //option 1 
+$infos = $upload->getInfo(); //option 2 
+
+//According to the above options, you can get individual image info as follow:
+$image_name = $infos->getName; // IMG_XH56.jpg
+$image_size = $infos->getSize; // 13094
+$image_width = $infos->getWidth; // 710
+$image_height = $infos->getHeigth; // 710
+
+//You can also get individual image name, size, width and height after image uploaded without first getting all info as follow:
+
+$image_name = $upload->getName(); //option 1
+$image_name = Kropify::getName(); //option 2
+
+$image_size = $upload->getSize(); //option 1
+$image_size = Kropify::getSize(); //option 2
+
+$image_width = $upload->getWidth(); //option 1
+$image_width = Kropify::getWidth(); //option 2
+
+$image_height = $upload->getHeigth(); //option 1
+$image_height = Kropify::getHeigth(); //option 2
+
+
+/**
+ * According to the above guidance, use the following examples 
+ * to save cropped image data into database.
+ */
+
  $user = new User();
- $user->profile = $infos->getName;
+ $user->profile = $image_name; //IMG_USER_982.jpg
  $user->save();
 
  //Return json data
- return response()->json(['kropifyStatus'=>"OK",'kropifyMessage'=>'Your profile picture has been.','image'=>$infos], 201);
+ return response()->json([
+   'kropifyStatus'=>"OK",
+   'kropifyMessage'=>'Your profile picture has been successfully updated.',
+   'imageInfo'=>$infos], 
+   201);
 ```
-
 
 ## Not supported
 Currently, uploading cropped image using Laravel **`Livewire`** is not supported. This package still in development, Once uploading cropped image in Laravel Livewire available, we will notify you.

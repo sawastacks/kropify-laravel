@@ -19,11 +19,11 @@
 
 > **NOTE:** **`Kropify`** cannot be integrated into Laravel framework only. It has another php version that can be integrated into CodeIgniter and Core PHP projects.  
 
- <p align="center">  
-
- [![Hello World](img/ko-fi.png)](https://buymeacoffee.com/mberecall)
-
- </p>
+ <p align="centerx">  
+ <a href="https://www.buymeacoffee.com/mberecall" target="_blank">
+   <img src="img/bmc.png" alt="drawing" style="width:200px;"/>
+ </a>
+</p>
 
 ## What is a **Kropify**?
 

@@ -71,7 +71,10 @@ When new **Kropify** version released and try to update the current package to t
 ```bash
  composer update mberecall/kropify-laravel
 ```
-
+When package not updated by using the above command, use below command that will remove current package version and install new version of package.
+```bash
+composer remove mberecall/kropify-laravel && composer require mberecall/kropify-laravel
+```
 After Kropify package updated, you need also to update its assets (**css** and **js** minified files) by running the following command in terminal:
 
 ```bash

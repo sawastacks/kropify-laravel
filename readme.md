@@ -81,10 +81,16 @@ After Kropify package updated, you need also to update its assets (**css** and *
  php artisan vendor:publish --tag=kropify-assets --force
 ```
 
-Finally, for `Kropify` directives, you have to run this command to get immediately changes in views.
+For `Kropify` directives, you have to run this command to get immediately changes in views.
 
 ```bash
  php artisan view:clear
+```
+
+Finally, It is neccessary to run the following command to autoload package files.
+
+```bash
+composer dump-autoload
 ```
 #
 # Usage

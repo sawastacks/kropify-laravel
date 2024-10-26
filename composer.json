@@ -17,7 +17,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Sawa Stacks (sawastacks)",
+            "name": "Sawa Stacks Inc.",
             "email": "sawastacks@gmail.com",
             "role": "Developer"
         }
@@ -28,14 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SawaStacks\\Utils\\Library\\": "src/"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "SawaStacks\\Utils\\Library\\KropifyServiceProvider"
-            ]
+            "SawaStacks\\Utils\\": "src/"
         }
     }
 }

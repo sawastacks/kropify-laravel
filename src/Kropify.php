@@ -9,7 +9,7 @@
  * MIT license: https://github.com/sawastacks/kropify-laravel/blob/master/LICENSE
  */
 
-namespace SawaStacks\Utils\Library;
+namespace SawaStacks\Utils;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;

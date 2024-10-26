@@ -9,14 +9,14 @@
  * MIT license: https://github.com/sawastacks/kropify-laravel/blob/master/LICENSE
  */
 
-namespace SawaStacks\Utils\Library;
+namespace SawaStacks\Utils;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 
 /**
  * Class KropifyServiceProvider
- * @package SawaStacks\Utils\Library
+ * @package SawaStacks\Utils
  */
 class KropifyServiceProvider extends ServiceProvider
 {

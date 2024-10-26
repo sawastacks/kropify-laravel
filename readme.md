@@ -34,7 +34,6 @@ A **Kropify** is a tool that can be integrated into `Laravel framework`, `CodeIg
 - PHP >= 7.2
 - [Composer](https://getcomposer.org/) is required
 - Laravel 8.x, 9.x , 10.x and 11.x
-- [Image Intervention](https://image.intervention.io/v2) package
 - [JQuery 3.x](https://releases.jquery.com/)
 
 # Installation
@@ -53,7 +52,7 @@ Just run the following command in your cmd or terminal:
 
     In the **`$providers`** array, add the service providers for this package.
    ```php
-     SawaStacks\Utils\Library\KropifyServiceProvider::class,
+     SawaStacks\Utils\KropifyServiceProvider::class,
    ```
  
 
@@ -137,12 +136,15 @@ Suppose that you have an input file on your form for user profile picture:
        body{ font-family: serif;  width: 100%; height: 100%; }
        .box{ display: flex;justify-content: center;align-items: center;flex-direction: column; margin-top: 20px; }
         .previewElement{ display: block;width: 120px;height: 120px;background: #ddd; }
+        .previewElement img{ width: 100%; height:auto; }
     </style>
 </head>
 <body>
-  <div class="box">
+ <div class="box">
     <h4>Kropify for Laravel</h4>
-    <div class="previewElement"></div>
+    <div class="previewElement">
+       <img src="" alt="" class="preview" data-kropify-default="...addCurrentImagePathIfExists.png">
+    </div>
       <div class="file-box">
         <label>User profile</label>
         <input type="file" id="avatar" name="avatar">
@@ -166,15 +168,17 @@ When you want to initiate **Kropify** on that particular input file, you will us
 ```javascript
   <script>
     $('input#avatar').Kropify({
-        preview:'.previewElement',
+        preview:'img.preview',
         viewMode:1,
         aspectRatio:1,
         cancelButtonText:'Cancel',
         resetButtonText:'Reset',
         cropButtonText:'Crop & update',
         processURL:'{{ route("crop-handler") }}',
-        maxSize:2097152,
+        maxSize:2097152, //2MB
         showLoader:true,
+        animationClass:'headShake', //headShake, bounceIn, pulse
+        fileName:'avatar',
         success:function(data){
          // console.log(data);
          // console.log(data.status); //Kropify status
@@ -195,13 +199,15 @@ When you want to initiate **Kropify** on that particular input file, you will us
 |-------------  | :-------------: | ---------- |
 | `viewMode` | 1 | You can set this value to (1,2 or 3). But you can not add this option if you are happy with the default value which is 1. |
 | `aspectRatio` | 1 | You can add your custom cropped image ratio. You can use fractional numbers and float numbers. **eg**: `16/4`, `10/32`, `0.25`, `2.25`, etc... |
-|`preview` | **required** | This option is very required, This is where you define the output to preview the cropped image. Here, you must use jquery selector to select **id=""** or **class=""** of the element. We recommended to use `<span>` or `<div>` tags.|
+|`preview` | **required** | This option is very required. This is where you define the output element to preview the cropped image. Here, you must use jquery selector to select **id="..."** or **class="..."** of the img tag element where you want to display cropped image result.|
 |`cancelButtonText` | Cancel | You can change this button text with your need and according to your language. |
 | `resetButtonText` | Reset| You can change this button text with your need and according to your language.|
 |`cropButtonText`| Crop | You can change this button text with your need and according to your language. |
 |`maxSize`| 2097152 | By default, this value set to the maximum size of **2MB** .But, you can set your own maximum size of selected  image. |
 |`processURL`|-|This option is very required. You must define your url of croping selected image. eg: **_processURL : "{{ route('crop') }}"_** or **_processURL : "{{ url('crop') }}"_**|
 |`showLoader`|true|If you want to display loading element when user croping the selected image, you can set this option to _**true**_. But if you do not want that loading element appears on page, set this option to _**false**_.|
+|`animationClass`|pulse|If you want to animate cropping area, you may use this option by choosing one of three animation classes allowed `pulse`,`headShake`,`fadeIn` and `pulse`. By default, this value set to `pulse` class.|
+|`fileName`|-| This will be used when want to specify or overwrite file name of the input file. |
 
 ### Errors callback
 This callback has two arguments, `error` and `text`
@@ -221,7 +227,7 @@ This callback has two arguments, `error` and `text`
 To include **Kropify** class in controller is very simple. Just import the following lines on your controller.
 
 ```php
- use SawaStacks\Utils\Library\Kropify;
+ use SawaStacks\Utils\Kropify;
 ```
 
 
@@ -310,6 +316,6 @@ You can not also upload image to AWS Amazon `S3`.
 
 ## Copyright and License
 
-This package was written by [Sawa Stacks (sawastacks)](https://github.com/sawastacks) and is released under the [MIT License](https://github.com/sawastacks/kropify-laravel/blob/master/LICENSE).
+This package was written by [Sawa Stacks](https://github.com/sawastacks) and is released under the [MIT License](https://github.com/sawastacks/kropify-laravel/blob/master/LICENSE).
 
 Copyright (c) 2023 - Sawa Stacks

@@ -6,7 +6,7 @@
  * Author: Sawa Stacks - sawastacks@gmail.com
  * GitHub : github.com/sawastacks
  * Initial version created on: 10/03/2023
- * MIT license: https://github.com/sawastacks/gropy/blob/master/LICENSE
+ * MIT license: https://github.com/sawastacks/kropify-laravel/blob/master/LICENSE
  */
 
 namespace SawaStacks\Utils;

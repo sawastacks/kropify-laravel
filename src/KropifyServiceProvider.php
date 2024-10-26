@@ -15,14 +15,14 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 
 /**
- * Class GropyServiceProvider
+ * Class KropifyServiceProvider
  */
 class KropifyServiceProvider extends ServiceProvider
 {
     /**
      * @var string
      */
-    const PACKAGE_PUBLIC_ASSETS_PATH = 'vendors/sawastacks/gropy';
+    const PACKAGE_PUBLIC_ASSETS_PATH = 'vendors/sawastacks/kropify';
     /**
      * Register services.
      * @return void

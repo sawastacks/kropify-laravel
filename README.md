@@ -168,7 +168,7 @@ Route::post('/crop',[TestController::class,'cropHandler'])->name('crop-handler')
 When you want to initiate **Kropify** on that particular input file, you will use the following scripts.
 ```javascript
   <script>
-    $('input#avatar').Kropify({
+    $('input#avatar').kropify({
         preview:'img.preview',
         viewMode:1,
         aspectRatio:1,

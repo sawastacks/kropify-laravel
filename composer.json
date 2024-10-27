@@ -1,0 +1,41 @@
+{
+    "name": "sawastacks/kropify-laravel",
+    "description": "Kropify is a tool that can be integrated into Laravel framework from version 8 and above for the purpose of giving users easy way to crop their profile pictures and cover images.",
+    "homepage": "https://github.com/sawastacks/kropify-laravel",
+    "keywords": [
+        "kropify",     
+        "laravel-kropify",
+        "laravel",
+        "php",
+        "cropper",
+        "crop",
+        "cropping",
+        "sawastacks",       
+        "ijabocroptool"    
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sawa Stacks Inc.",
+            "email": "sawastacks@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.2|^8.0",
+        "intervention/image": "^2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "SawaStacks\\Utils\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SawaStacks\\Utils\\KropifyServiceProvider"
+            ]
+        }
+    }
+}

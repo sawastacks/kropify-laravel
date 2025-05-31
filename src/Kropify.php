@@ -30,7 +30,7 @@ class Kropify
     protected bool $saveCalled = false;
 
     /**
-     * Create a new instance of Kropify and assign the file and optional filename.
+     * Create a new instance of Pica and assign the file and optional filename.
      * Must be the first call in the chain.
      * @param mixed $file The file to be uploaded (typically an instance of UploadedFile).
      * @param string|null $filename Optional custom filename.
@@ -123,14 +123,15 @@ class Kropify
         $filename = self::decideFileExtension($og_filename);
 
         $path = self::addEndingSlash($this->path);
-        File::ensureDirectoryExists($path);
-
+ 
         if ($this->useStorage) {
             $disk = $this->disk ?? 'public';
+            Storage::disk($disk)->makeDirectory($path);
             $final_filename = self::setFinalStorageFileName($path, $filename, $disk);
             Storage::disk($disk)->putFileAs($path, $this->file, $final_filename);
             $storedPath = Storage::disk($disk)->path($path . $final_filename);
         } else {
+            File::ensureDirectoryExists($path);
             $final_filename = self::setFinalFileName($path, $filename);
             $this->file->move(public_path($path), $final_filename);
             $storedPath = public_path($path . $final_filename);

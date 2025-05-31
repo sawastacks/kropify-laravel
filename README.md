@@ -168,7 +168,7 @@ Suppose that you have an input file on your form for user profile picture:
     </div>
 
     <!-- Targeted input file -->
-    <input type="file" id="imageInput">
+    <input type="file" name="avatar" id="imageInput">
 
  
 
@@ -181,11 +181,11 @@ Suppose that you have an input file on your form for user profile picture:
         const cropper = new Kropify('#imageInput', {
             aspectRatio: 1,
             preview: '#image-preview',
-            processURL: '{{ route("crop-handler") }}',
+            processURL: '{{ route("crop-handler") }}', // or processURL:'/crop'
             allowedExtensions: ['jpg', 'jpeg', 'png'],
             showLoader: true,
             animationClass: 'pulse',
-            fileName: 'avatar',
+            // fileName: 'avatar', // leave this commented if you want it to default to the input name
             cancelButtonText:'Cancel',
             maxWoH:500,
             onError: function (msg) {
@@ -218,12 +218,12 @@ When you want to initiate **Kropify** on that particular input file, you will us
             aspectRatio: 1,
             viewMode: 1,
             preview: 'img#image-preview',
-            processURL: '{{ route("crocrop-handler") }}',
+            processURL: '{{ route("crop-handler") }}', // or processURL:'/crop'
             maxSize: 2 * 1024 * 1024, // 2MB
             allowedExtensions: ['jpg', 'jpeg', 'png'],
             showLoader: true,
             animationClass: 'pulse',
-            fileName: 'avatar',
+             // fileName: 'avatar', // leave this commented if you want it to default to the input name
             cancelButtonText:'Cancel',
             resetButtonText: 'Reset',
             cropButtonText: 'Crop & Upload',
@@ -233,8 +233,8 @@ When you want to initiate **Kropify** on that particular input file, you will us
                 // toastr.error(msg);
             },
             onDone: function(response){
-                alert(response.message);
-                console.log(response.data);
+                // alert(response.message);
+                console.log(response);
                 // toastr.success(response.message);
             }
         });
@@ -288,17 +288,31 @@ To include **Kropify** class in controller is very simple. Just import the follo
 To upload the cropped image you will use the following lines inside method:
 
 ```php
-$file = $request->file('avatar');
+public function cropHandler(Request $request){
 
-$path = 'uploads';
+  $file = $request->file('avatar');
 
-$upload = Kropify::getFile($file,'userpic.png')
+  $path = 'uploads';
+
+/** When you upload with move() */
+  $upload = Kropify::getFile($file,'userpic.png')
          //   ->setDisk('public') // local, public
               ->setPath($path)
               ->useMove()
               ->save();
 
-/** GET UPLOADED IMAGE DETAILS (INFO) */
+
+/** When you upload with Storage */
+  $upload = Kropify::getFile($file,'userpic.png')
+              ->setDisk('public') // local, public
+              ->setPath($path)
+            //   ->useMove()
+              ->save();
+
+/** 
+ * GET UPLOADED IMAGE DETAILS (INFO) 
+ * =================================
+ * */
 
 // if( $upload ){ $info = $upload->getUploadedInfo(); }
 
@@ -327,6 +341,8 @@ $im->save();
             'message'=>'Image successfully uploaded',
             'data'=>$info
     ],201);
+
+}
 ```
 
 

@@ -257,7 +257,7 @@ When you want to initiate **Kropify** on that particular input file, you will us
 `cancelButtonText` | `String` | You can change this button text with your need and according to your language. |
 | `resetButtonText` | `String`| You can change this button text with your need and according to your language.|
 |`cropButtonText`| `String` | You can change this button text with your need and according to your language.
-`maxWoH`|`Number`|Maximum width or height of the image.
+`maxWoH`|`Number`|Maximum width / height of the image.
 `onError`|`Function`|Callback function on error (shows alert/toastr/etc.).
 `onDone`|`Function`|Callback function when upload is successful (`response` is passed).
 `maxSize`|`Number`|By default, this value set to the maximum size of **2MB** .But, you can set your own maximum size of selected  image.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sawastacks\Utils;
+namespace SawaStacks\Utils;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;

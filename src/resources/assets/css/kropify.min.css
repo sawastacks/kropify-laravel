@@ -1,9 +1,9 @@
 @charset "UTF-8";/*!
- * animate.css - https://animate.style/
- * Version - 4.1.1
- * Licensed under the MIT license - http://opensource.org/licenses/MIT
+ * 
+ * 
+ * 
  *
- * Copyright (c) 2020 Animate.css
+ * 
  */:root{--animate-duration:1s;--animate-delay:1s;--animate-repeat:1}
 .animate__animated{-webkit-animation-duration:1s;animation-duration:1s;-webkit-animation-duration:var(--animate-duration);animation-duration:var(--animate-duration);-webkit-animation-fill-mode:both;animation-fill-mode:both}
 .animate__animated.animate__infinite{-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite}
@@ -523,15 +523,7 @@ to{visibility:hidden;-webkit-transform:translate3d(0,-100%,0);transform:translat
 }@keyframes slideOutUp{0%{-webkit-transform:translateZ(0);transform:translateZ(0)}
 to{visibility:hidden;-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0)}
 }.animate__slideOutUp{-webkit-animation-name:slideOutUp;animation-name:slideOutUp}
-/*!
- * Cropper.js v1.5.13
- * https://fengyuanchen.github.io/cropperjs
- *
- * Copyright 2015-present Chen Fengyuan
- * Released under the MIT license
- *
- * Date: 2022-11-20T05:30:43.444Z
- */.cropper-container{direction:ltr;font-size:0;line-height:0;position:relative;-ms-touch-action:none;touch-action:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+.cropper-container{direction:ltr;font-size:0;line-height:0;position:relative;-ms-touch-action:none;touch-action:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
 .cropper-container img{-webkit-backface-visibility:hidden;backface-visibility:hidden;display:block;height:100%;image-orientation:0;max-height:none !important;max-width:none !important;min-height:0 !important;min-width:0 !important;width:100%}
 .cropper-canvas,.cropper-crop-box,.cropper-drag-box,.cropper-modal,.cropper-wrap-box{bottom:0;left:0;position:absolute;right:0;top:0}
 .cropper-canvas,.cropper-wrap-box{overflow:hidden}.cropper-drag-box{background-color:#fff;opacity:0}

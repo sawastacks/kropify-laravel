@@ -9,116 +9,182 @@
  * MIT license: https://github.com/sawastacks/kropify-laravel/blob/master/LICENSE
  */
 
-namespace SawaStacks\Utils;
+namespace Sawastacks\Utils;
 
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Request;
-use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\File;
 use Exception;
-
-/**
- * @method static self getFile(string $file, string $filename = null)
- * @method static self maxWoH(int $max)
- * @method static self save(string $path)
- */
 
 class Kropify
 {
-    /**
-     * The requested file.
-     *
-     * @var string
-     */
-    private static $_getFile;
-    /**
-     * Set new file name
-     *
-     * @var string
-     */
-    private static $_setFileName;
-    /**
-     * Set path
-     *
-     * @var string
-     */
-    private static $_setPath;
+    protected $file;
+    protected $filename;
+    protected $disk;
+    protected $path = '';
+    protected $extension;
+    protected $image;
+    protected bool $useStorage = false;
+    protected bool $useMove = false;
+    protected $uploadedInfo = [];
+    protected bool $fileInitialized = false;
+    protected bool $saveCalled = false;
 
     /**
-     * Set maximum width or height
-     *
-     * @var int
+     * Create a new instance of Kropify and assign the file and optional filename.
+     * Must be the first call in the chain.
+     * @param mixed $file The file to be uploaded (typically an instance of UploadedFile).
+     * @param string|null $filename Optional custom filename.
+     * @return self
+     * @throws Exception If the file is not provided.
      */
-    private static $_maxWoH;
-
-    /**
-     * Get file info
-     */
-    private static $_fileInfo = null;
-
-    public $getName = null;
-    public $getSize = null;
-    public $getWidth = null;
-    public $getHeight = null;
-
-    public function __call($name, $arguments)
+    public static function getFile($file, $filename = null): self
     {
+        if (!$file) {
+            throw new Exception('The getFile() method requires at least one argument: the file.');
+        }
+        $instance = new self();
+        $instance->file = $file;
+        $instance->filename = $filename;
+        $instance->fileInitialized = true;
+        return $instance;
+    }
+
+    /**
+     * Set the storage disk to be used when saving the file.
+     * @param string $disk The disk name (e.g., "public", "s3").
+     * @return self
+     * @throws Exception If getFile() was not called before this, if useMove() is already used, or if disk name is empty.
+     */
+    public function setDisk(string $disk): self
+    {
+        if (!$this->fileInitialized) {
+            throw new Exception('You must call getFile() before setDisk().');
+        }
+        if ($this->useMove) {
+            throw new Exception('You cannot use setDisk() and useMove() together.');
+        }
+        if (!$disk) {
+            throw new Exception('The setDisk() method requires one parameter: disk name.');
+        }
+        $this->disk = $disk;
+        $this->useStorage = true;
         return $this;
     }
 
     /**
-     * Get requested image file
-     * 
-     * @param string $file
-     * @param string $filename
-     * @return SawaStacks\Utils\Kropify
+     * Disable Laravel's Storage facade and use move() function instead.
+     * @return self
+     * @throws Exception If getFile() was not called before this or if setDisk() is already used.
      */
-    public static function getFile($file, $filename = null)
+    public function useMove(): self
     {
-        self::$_getFile = $file;
-        self::$_setFileName = $filename;
-        return new static;
-    }
-
-    /**
-     * @param int $max
-     * @return SawaStacks\Utils\Kropify
-     */
-    public static function maxWoH($max = 500)
-    {
-        self::$_maxWoH = $max;
-        return new static;
-    }
-
-    /**
-     * @method static string addEndingSlash(string $path)
-     */
-    public static function addEndingSlash($path)
-    {
-        $slashType = (strpos($path, '\\') === 0) ? 'win' : 'unix';
-        $lastChar = substr($path, strlen($path) - 1, 1);
-        if ($lastChar != '/' && $lastChar != '\\') {
-            $path .= ($lastChar == 'win' ? '\\' : '/');
+        if (!$this->fileInitialized) {
+            throw new Exception('You must call getFile() before useMove().');
         }
-        return $path;
+        if ($this->useStorage) {
+            throw new Exception('You cannot use setDisk() and useMove() together.');
+        }
+        $this->useMove = true;
+        return $this;
     }
 
     /**
-     * Generate and return unique image filename
-     * 
-     * @method static string setFileName(string $path, string $filename)
+     * Set the relative path where the file should be saved.
+     * @param string $path The desired path (relative to storage or public folder).
+     * @return self
+     * @throws Exception If getFile() was not called before this.
      */
-    public static function setFileName($path, $filename)
+    public function setPath(string $path): self
+    {
+        if (!$this->fileInitialized) {
+            throw new Exception('You must call getFile() before setPath().');
+        }
+        $this->path = trim($path, '/');
+        return $this;
+    }
+
+    /**
+     * Save the file. Must be the last call in the chain.
+     * @return self
+     * @throws Exception If save() is called more than once or getFile() was not called.
+     */
+    public function save(): self
+    {
+        if ($this->saveCalled) {
+            throw new Exception('The save() method can only be called once.');
+        }
+        if (!$this->fileInitialized) {
+            throw new Exception('You must call getFile() before save().');
+        }
+
+        $this->saveCalled = true;
+
+        $og_filename = ($this->filename) ? $this->filename : md5(rand(1, 10)) . time() . bin2hex(random_bytes(10)) . '.png';
+        $filename = self::decideFileExtension($og_filename);
+
+        $path = self::addEndingSlash($this->path);
+        File::ensureDirectoryExists($path);
+
+        if ($this->useStorage) {
+            $disk = $this->disk ?? 'public';
+            $final_filename = self::setFinalStorageFileName($path, $filename, $disk);
+            Storage::disk($disk)->putFileAs($path, $this->file, $final_filename);
+            $storedPath = Storage::disk($disk)->path($path . $final_filename);
+        } else {
+            $final_filename = self::setFinalFileName($path, $filename);
+            $this->file->move(public_path($path), $final_filename);
+            $storedPath = public_path($path . $final_filename);
+        }
+
+        // Get image details
+        [$width, $height] = getimagesize($storedPath);
+        $extension = pathinfo($final_filename, PATHINFO_EXTENSION);
+
+        $this->uploadedInfo = [
+            'filename'  => $final_filename,
+            'size'      => filesize($storedPath),
+            'extension' => $extension,
+            'width'     => $width,
+            'height'    => $height,
+            'mime'      => mime_content_type($storedPath),
+            'path'      => $storedPath,
+            'url'       => $this->useStorage
+                ? Storage::disk($this->disk)->path($path . $final_filename)
+                : asset($path . $final_filename),
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Get details about the uploaded file.
+     *
+     * @return array An array containing filename, size, extension, width, height, mime, path, and url.
+     * @throws Exception If save() has not been called before this.
+     */
+    public function getUploadedInfo(): array
+    {
+        if (!$this->saveCalled) {
+            throw new Exception('You must call save() before getting uploaded info.');
+        }
+        return $this->uploadedInfo;
+    }
+
+    // --------------------- Utility Methods ------------------------
+
+    /**
+     * Set a unique final filename when using PHP's move() (no Storage).
+     *
+     * @param string $path The target directory path.
+     * @param string $filename The desired filename.
+     * @return string Unique filename.
+     */
+    public static function setFinalFileName($path, $filename)
     {
         $filename = self::decideFileExtension($filename);
-        if ($pos = strrpos($filename, '.')) {
-            $name = substr($filename, 0, $pos);
-            $ext = substr($filename, $pos);
-        } else {
-            $name = $filename;
-        }
-
+        $pos = strrpos($filename, '.');
+        $name = $pos !== false ? substr($filename, 0, $pos) : $filename;
+        $ext = $pos !== false ? substr($filename, $pos) : '';
         $newpath = $path . '/' . $filename;
         $newname = $filename;
         $counter = 1;
@@ -131,172 +197,53 @@ class Kropify
     }
 
     /**
-     * Return real file extension
-     * 
-     * @method static string decideFileExtension(string $filename)
+     * Set a unique final filename when using Laravel's Storage.
+     *
+     * @param string $path The target directory path.
+     * @param string $filename The desired filename.
+     * @param string $disk The storage disk.
+     * @return string Unique filename.
+     */
+    public static function setFinalStorageFileName(string $path, string $filename, string $disk = 'public'): string
+    {
+        $pos = strrpos($filename, '.');
+        $name = $pos !== false ? substr($filename, 0, $pos) : $filename;
+        $ext = $pos !== false ? substr($filename, $pos) : '';
+        $newname = $filename;
+        $counter = 1;
+        while (Storage::disk($disk)->exists($path . '/' . $newname)) {
+            $newname = $name . '_' . $counter . $ext;
+            $counter++;
+        }
+        return $newname;
+    }
+
+    /**
+     * Ensure file extension is valid; defaults to .png if missing.
+     *
+     * @param string $filename The filename to check.
+     * @return string Filename with extension.
      */
     public static function decideFileExtension($filename)
     {
-        $fn = null;
-        if (preg_match('/(\.jpg|\.png|\.bmp|\.jpg)$/i', $filename)) {
-            $fn = $filename;
-        } else {
-            $fn = $filename .= ".png";
+        if (preg_match('/(\.jpg|\.png|\.bmp|\.jpeg)$/i', $filename)) {
+            return $filename;
         }
-        return $fn;
+        return $filename . '.png';
     }
 
     /**
-     * Upload cropped image without maximum width or height option
-     * 
-     * @method static string uploadWithoutMaxWoH(string $file, string $path, string $filename)
+     * Add a trailing slash to a path if it doesn't have one.
+     *
+     * @param string $path The path to modify.
+     * @return string Path with trailing slash.
      */
-    public static function uploadWithoutMaxWoH($file, $path, $filename)
+    public static function addEndingSlash($path)
     {
-        try {
-            $upload = $file->move($path, $filename);
-            if ($upload) {
-                $arr = [
-                    'getName' => $filename,
-                    'getSize' => self::getUploadeImageSize($path, $filename),
-                    'getWidth' => self::getUploadeImageDimension($path, $filename)[0],
-                    'getHeight' => self::getUploadeImageDimension($path, $filename)[1],
-                ];
-                self::$_fileInfo = (object)$arr;
-            } else {
-                return [];
-            }
-        } catch (\Throwable $th) {
-            throw $th;
+        $lastChar = substr($path, -1);
+        if ($lastChar !== '/' && $lastChar !== '\\') {
+            $path .= '/';
         }
-    }
-
-    /**
-     * Upload cropped image with maximum width or height option
-     * 
-     * @method static string uploadWithMaxWoH(string $file, string $path, string $filename, int $maxWoH)
-     */
-    public static function uploadWithMaxWoH($file, $path, $filename, $maxWoH)
-    {
-        try {
-
-            if ($maxWoH && $maxWoH != null) {
-                $s_width = $maxWoH;
-                $s_height = $maxWoH;
-                $actual_path = $path;
-                $path = $path . $filename;
-                $image = Image::make($file->path());
-                $image->height() > $image->width() ? $s_width = null : $s_height = null;
-                $image->resize($s_width, $s_height, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                });
-                $image->save($path);
-
-                $arr = [
-                    'getName' => $filename,
-                    'getSize' => self::getUploadeImageSize($actual_path, $filename),
-                    'getWidth' => self::getUploadeImageDimension($actual_path, $filename)[0],
-                    'getHeight' => self::getUploadeImageDimension($actual_path, $filename)[1],
-                ];
-                self::$_fileInfo = (object)$arr;
-            }
-        } catch (\Throwable $th) {
-            throw $th;
-        }
-    }
-
-    /**
-     * Return all Image Details
-     * 
-     * @return self
-     */
-    public static function getInfo()
-    {
-        return self::$_fileInfo;
-    }
-
-    /**
-     * Return Image Name
-     * 
-     * @return self
-     */
-    public static function getName()
-    {
-        return self::getInfo()->getName;
-    }
-
-    /**
-     * Return Image Size
-     * 
-     * @return self
-     */
-    public static function getSize()
-    {
-        return self::getInfo()->getSize;
-    }
-
-    /**
-     * Return Image Width
-     * 
-     * @return self
-     */
-    public static function getWidth()
-    {
-        return self::getInfo()->getWidth;
-    }
-
-    /**
-     * Return Image Height
-     * 
-     * @return self
-     */
-    public static function getHeight()
-    {
-        return self::getInfo()->getHeight;
-    }
-
-    /**
-     * Save cropped image to the specified path
-     * 
-     * @param  string $path
-     * @return self
-     */
-    public static function save($path)
-    {
-        if (!self::$_getFile) {
-            throw new Exception('Define "getFile()" function with value');
-        }
-
-        if ($path == null || empty($path)) {
-            throw new Exception('Define "save($path)" by adding real path argument');
-        }
-        self::$_setPath = $path;
-        $getpath = self::$_setPath;
-        $path = self::addEndingSlash($getpath);
-        File::ensureDirectoryExists($path);
-        $toPath = $path;
-        $filename = (self::$_setFileName) ? self::$_setFileName :  md5(rand(1, 10)) . time() . bin2hex(random_bytes(10)) . '.png';
-        $new_filename = self::setFileName($path, $filename);
-        $file = self::$_getFile;
-        self::$_maxWoH ? self::uploadWithMaxWoH($file, $toPath, $new_filename, self::$_maxWoH) : self::uploadWithoutMaxWoH($file, $toPath, $new_filename);
-
-        return new static;
-    }
-
-    /**
-     *  @method static string getUploadeImageSize(string $path, string $filename)
-     */
-    public static function getUploadeImageSize($path, $filename)
-    {
-        return File::size($path . $filename);
-    }
-
-    /**
-     *  @method static string getUploadeImageDimension(string $path, string $filename)
-     */
-    public static function getUploadeImageDimension($path, $filename)
-    {
-        return getimagesize($path . $filename);
+        return $path;
     }
 }
